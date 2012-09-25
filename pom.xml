@@ -134,7 +134,6 @@
 	</distributionManagement>
 
   <modules>
-    <module>annotation-activity</module>
     <module>annotation-activity-ui</module>
     <module>annotation-plugin</module>
   </modules>

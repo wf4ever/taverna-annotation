@@ -28,11 +28,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>annotation-activity</artifactId>
-			<version>0.01-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>annotation-activity-ui</artifactId>
 			<version>0.01-SNAPSHOT</version>
 		</dependency>
