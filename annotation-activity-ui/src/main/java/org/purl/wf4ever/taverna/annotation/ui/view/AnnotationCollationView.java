@@ -20,12 +20,10 @@ import javax.swing.JPanel;
 import net.sf.taverna.t2.workbench.ui.views.contextualviews.ContextualView;
 import net.sf.taverna.t2.workflowmodel.Dataflow;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.purl.wf4ever.taverna.annotation.ui.view.AnnotationCollationView.WfAnnotation;
 
 @SuppressWarnings("serial")
 public class AnnotationCollationView extends ContextualView {
@@ -33,9 +31,10 @@ public class AnnotationCollationView extends ContextualView {
 	private JLabel description = new JLabel("ads");
 	private static Logger logger = Logger
 			.getLogger(AnnotationCollationView.class);
-	private static final String WF_BY_UUID_QUERY = "http://rdf.myexperiment.org/sparql?query=PREFIX+dcterms%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0APREFIX+mecomp%3A+%3Chttp%3A%2F%2Frdf.myexperiment.org%2Fontologies%2Fcomponents%2F%3E+%0D%0APREFIX+mecontrib%3A+%3Chttp%3A%2F%2Frdf.myexperiment.org%2Fontologies%2Fcontributions%2F%3E+%0D%0ASELECT+DISTINCT+%3Fwf%0D%0AWHERE+%7B+%0D%0A++%3Fwf+mecomp%3Aexecutes-dataflow+%3Fdf+.+%0D%0A++%3Fdf+dcterms%3Aidentifier+%3Fuuid+.+%0D%0A++FILTER+regex%28%3Fuuid%2C%27{uuid}%27%29+%0D%0A%7D&formatting=JSON";
+	private static final String WF_BY_UUID_QUERY = "http://rdf.myexperiment.org/sparql?query=PREFIX+dcterms%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0APREFIX+mecomp%3A+%3Chttp%3A%2F%2Frdf.myexperiment.org%2Fontologies%2Fcomponents%2F%3E+%0D%0APREFIX+mecontrib%3A+%3Chttp%3A%2F%2Frdf.myexperiment.org%2Fontologies%2Fcontributions%2F%3E+%0D%0ASELECT+DISTINCT+%3Fwf+%3Fuuid+%0D%0AWHERE+%7B+%0D%0A++%3Fwf+a+mecontrib%3AWorkflowVersion+%3B%0D%0A++++++mecomp%3Aexecutes-dataflow+%3Fdf+.%0D%0A++%3Fdf+dcterms%3Aidentifier+%3Fuuid+.+%0D%0A+++FILTER+regex%28%3Fuuid%2C%27xxxx%27%29+%0D%0A%7D&formatting=JSON&softlimit=5";
+			
 
-	private static final String TITLE_DESCRIPTION_QUERY = "http://rdf.myexperiment.org/sparql?query=BASE+%3Chttp%3A%2F%2Fwww.myexperiment.org%2F%3E%0D%0APREFIX+dc%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Fdescription%2C+%3Ftitle%0D%0AWHERE+%7B%0D%0A++{wf}+dc%3Adescription+%3Fdescription+%3B%0D%0A+++++++++++++++++++++++++++++++++++++++++++++dc%3Atitle+%3Ftitle%0D%0A%7D%0D%0A&formatting=JSON";
+	private static final String TITLE_DESCRIPTION_QUERY = "http://rdf.myexperiment.org/sparql?query=BASE+%3Chttp%3A%2F%2Fwww.myexperiment.org%2F%3E%0D%0APREFIX+dc%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Fdescription%2C+%3Ftitle%0D%0AWHERE+%7B%0D%0A++xxxx+dc%3Adescription+%3Fdescription+%3B%0D%0A+++++++++++++++++++++++++++++++++++++++++++++dc%3Atitle+%3Ftitle%0D%0A%7D%0D%0A&formatting=JSON";
 
 	public AnnotationCollationView(Dataflow selection) {
 		this.dataflow = selection;
@@ -59,7 +58,7 @@ public class AnnotationCollationView extends ContextualView {
 			throws IOException, JsonParseException, JsonMappingException,
 			MalformedURLException {
 
-		String url = WF_BY_UUID_QUERY.replace("{uuid}", dataflowIdentifier);
+		String url = WF_BY_UUID_QUERY.replace("xxxx", dataflowIdentifier);
 		List<URI> wfs = new ArrayList<URI>();
 		try {
 
@@ -118,7 +117,7 @@ public class AnnotationCollationView extends ContextualView {
 	private List<WfAnnotation> findAnnotations(URI wf) throws IOException,
 			JsonParseException, JsonMappingException, MalformedURLException {
 
-		String url = TITLE_DESCRIPTION_QUERY.replace("{wf}",
+		String url = TITLE_DESCRIPTION_QUERY.replace("xxxx",
 				"<" + wf.toASCIIString() + ">");
 		List<WfAnnotation> annotations = new ArrayList<WfAnnotation>();
 		try {
@@ -133,8 +132,8 @@ public class AnnotationCollationView extends ContextualView {
 				ann.setWorkflow(wf);
 				ann.setTitle(titleValue);
 
-				Map desc = (Map) binding.get("title");
-				String descValue = (String) title.get("value");
+				Map desc = (Map) binding.get("description");
+				String descValue = (String) desc.get("value");
 				ann.setDescription(descValue);
 				annotations.add(ann);
 			}
@@ -207,6 +206,19 @@ public class AnnotationCollationView extends ContextualView {
 			}
 			sb.append("</ul>");
 		}
+
+		// Descriptions
+		sb.append("<h3>Descriptions(s)</h3>");
+		for (String desc : descriptions.keySet()) {
+			sb.append("<p style='width: 1em'>" + desc + "<p>");
+			sb.append("<p>From: </p><ul>");
+			for (WfAnnotation ann : descriptions.get(desc)) {
+				sb.append("<li>" + ann.getWorkflow() + "</li>");
+			}
+			sb.append("</ul>");
+		}
+
+		
 		sb.append("</body></html>");
 
 		return sb.toString();
