@@ -6,7 +6,7 @@
 		<artifactId>annotation</artifactId>
 		<version>0.01-SNAPSHOT</version>
 	</parent>
-	<artifactId>annotation-activity-ui</artifactId>
+	<artifactId>annotation-view</artifactId>
 	<name>Annotation Taverna activity UI bindings</name>
 	<properties>
 		<jackson.version>1.9.4</jackson.version>
